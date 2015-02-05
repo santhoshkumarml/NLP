@@ -1,0 +1,15 @@
+.metadata
+.gradle
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*.pyc
+*~.nib
+local.properties
+.settings/
+.loadpath
+.pydevproject
+.project
+/RemoteSystemsTempFiles/
