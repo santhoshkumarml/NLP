@@ -67,16 +67,77 @@ class HMM(object):
         return prob, path[state]
     
     
-    def forwardProbability(self):
-        pass
-    
-    def backwardProbability(self):
-        pass
-    
-    def runBaumWelchAlgo(self, obs):
+    def expectation(self, obs):
         #e step
-        #calcuate episolon and gamma
-        episolon = numpy.zeros((len(self.states), len(self.states)))
-        gamma = numpy.zeros((len(obs),len(self.states)))
+        alpha = numpy.zeros((len(obs),len(self.states)))
+        beta = numpy.ones((len(obs)+1,len(self.states)))
+        
+        alpha[0] = [self.start_p[i]*self.emit_p[i][obs[0]] for i in self.states]
+        
+        for d in range(1,len(obs)):
+            alpha[d] = [ sum([alpha[d-1][oldState]*self.getTransProb(state, oldState)\
+                               for oldState in self.states])*self.emit_p[state][obs[d]]\
+                         for state in self.states]
+        
+        for d in range(len(obs)-2,-1,-1):
+            beta[d] = [sum([beta[d+1][state]*self.getTransProb(nextState, state)\
+                             for state in self.states])*self.emit_p[nextState][d+1]\
+                        for nextState in self.states]
+            
+        #P(O|λ) = for i=1..N πi bi(o1) β1(i)
+        #P(O|λ) = for i=1..N αT (i).
+        alpha_denominator = sum([alpha[len(obs)-1][i] for i in self.states])
+        
+        episolon = numpy.zeros((len(obs),len(self.states), len(self.states)))
+        gamma = numpy.zeros((len(obs), len(self.states)))
+        
+        for d in range(1,len(obs)-1):
+            for state in self.states:
+                for nextState in self.states:
+                    episolon[d][state][nextState] =\
+                     alpha[d-1][state]*self.getTransProb(nextState, state)*beta[d+1][nextState]
+                    episolon[d][state][nextState] /= alpha_denominator
+        
+        for d in range(0,len(obs)):
+            for state in self.states:
+                gamma[d][state] = alpha[state]*self.emit_p[state][obs[d]]*beta[state]
+                gamma[d][state] /= alpha_denominator
+                
+        return (episolon, gamma)                    
     
+    def getValueForObsDim(self, ob1, ob2):
+        if ob2 == ob1:
+            return 1
+        return 0
+    
+    def maximization(self, epsilon, gamma, obs):
+        
+        self.start_p =  [gamma[0][i] for i in self.states]
+        
+        expected_number_of_times_for_state = numpy.array([sum([gamma[d][i]  for d in range(len(obs))])for i in self.states]) 
+        
+        for oldState in self.states:
+            for state in self.states:
+                self.trans_p[oldState][state] = sum([epsilon[d][oldState][state] for d in range(1,len(obs))])
+                self.trans_p[oldState][state] /= expected_number_of_times_for_state[oldState]
+        
+        for state in self.states:
+            for ob in self.emit_p[0].keys():
+                self.emit_p[state][ob] = sum([self.getValueForObsDim(obs[d], ob)*gamma[d][state] for d in range(len(obs))])
+                self.emit_p[state][ob] /= expected_number_of_times_for_state[state]
+    
+    def runBaumWelchAlgo(self, obs, limit = 5):
+        it = 0
+        while it < limit:
+            epsilon,gamma = self.expectation(obs)
+            self.maximization(epsilon, gamma, obs)
+            it+=1
+            
+        print self.start_p
+        print self.trans_p
+        print self.emit_p
+        
+        return self.runViterbiAlgo(obs)
+        
+        
     

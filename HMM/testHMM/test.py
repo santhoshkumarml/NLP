@@ -3,7 +3,6 @@ Created on Feb 13, 2015
 
 @author: santhosh
 '''
-import algos
 from algos import HMMUtil
 
 states = ('Healthy', 'Fever')
@@ -26,3 +25,17 @@ hmm = HMMUtil.HMM(states, start_probability, transition_probability, emission_pr
 
 print hmm.runNaiveAlgo(observations, '')
 print hmm.runViterbiAlgo(observations)
+
+start_probability = {'Healthy': 0.5, 'Fever': 0.5}
+ 
+transition_probability = {
+   'Healthy' : {'Healthy': 0.7, 'Fever': 0.3},
+   'Fever' : {'Healthy': 0.3, 'Fever': 0.7}
+   }
+ 
+emission_probability = {
+   'Healthy' : {'normal': 0.4, 'cold': 0.3, 'dizzy': 0.3},
+   'Fever' : {'normal': 0.2, 'cold': 0.4, 'dizzy': 0.4}
+   }
+
+print hmm.runBaumWelchAlgo(observations)
