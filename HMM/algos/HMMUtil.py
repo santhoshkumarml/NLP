@@ -84,8 +84,6 @@ class HMM(object):
                              for state in self.states])*self.emit_p[nextState][d+1]\
                         for nextState in self.states]
             
-        #P(O|λ) = for i=1..N πi bi(o1) β1(i)
-        #P(O|λ) = for i=1..N αT (i).
         alpha_denominator = sum([alpha[len(obs)-1][i] for i in self.states])
         
         episolon = numpy.zeros((len(obs),len(self.states), len(self.states)))
@@ -100,7 +98,7 @@ class HMM(object):
         
         for d in range(0,len(obs)):
             for state in self.states:
-                gamma[d][state] = alpha[state]*self.emit_p[state][obs[d]]*beta[state]
+                gamma[d][state] = alpha[d][state]*self.emit_p[state][obs[d]]*beta[d][state]
                 gamma[d][state] /= alpha_denominator
                 
         return (episolon, gamma)                    

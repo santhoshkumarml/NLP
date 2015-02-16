@@ -26,16 +26,22 @@ hmm = HMMUtil.HMM(states, start_probability, transition_probability, emission_pr
 print hmm.runNaiveAlgo(observations, '')
 print hmm.runViterbiAlgo(observations)
 
-start_probability = {'Healthy': 0.5, 'Fever': 0.5}
+states = (0, 1)
+
+observations = (4, 3, 3, 1, 5)
+
+start_probability = {0: 0.5, 1: 0.5}
  
 transition_probability = {
-   'Healthy' : {'Healthy': 0.7, 'Fever': 0.3},
-   'Fever' : {'Healthy': 0.3, 'Fever': 0.7}
+   0 : {1: 0.7, 0: 0.3},
+   1 : {1: 0.3, 0: 0.7}
    }
  
 emission_probability = {
-   'Healthy' : {'normal': 0.4, 'cold': 0.3, 'dizzy': 0.3},
-   'Fever' : {'normal': 0.2, 'cold': 0.4, 'dizzy': 0.4}
+   0 : {1: 0.166666667, 2: 0.166666667, 3:0.166666667, 4: 0.166666667, 5: 0.166666667, 6: 0.166666667},
+   1 : {1: 0.166666667, 2: 0.166666667, 3:0.166666667, 4: 0.166666667, 5: 0.166666667, 6: 0.166666667}
    }
+
+hmm = HMMUtil.HMM(states, start_probability, transition_probability, emission_probability)
 
 print hmm.runBaumWelchAlgo(observations)
