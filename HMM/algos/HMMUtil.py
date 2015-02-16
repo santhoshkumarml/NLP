@@ -3,9 +3,9 @@ Created on Feb 4, 2015
 
 @author: santhosh
 '''
-
+import numpy
 class HMM(object):
-    def __init__(self,states, start_p, trans_p, emit_p):
+    def __init__(self, states, start_p, trans_p, emit_p):
         self.states = states
         self.start_p = start_p
         self.trans_p = trans_p
@@ -65,3 +65,18 @@ class HMM(object):
         stateProbability = [(state, V[-1][state]) for state in self.states]
         (state,prob) = max(stateProbability, key=lambda x: x[1])
         return prob, path[state]
+    
+    
+    def forwardProbability(self):
+        pass
+    
+    def backwardProbability(self):
+        pass
+    
+    def runBaumWelchAlgo(self, obs):
+        #e step
+        #calcuate episolon and gamma
+        episolon = numpy.zeros((len(self.states), len(self.states)))
+        gamma = numpy.zeros((len(obs),len(self.states)))
+    
+    
