@@ -222,9 +222,9 @@ write_predictions_to_file(os.path.join(os.getcwd(),'part-I-predictions.tsv'), ou
 
 # shortened keys so as to reduce the confusion matrix size
 d_keys = set(['JJ', 'NN', 'NNP', 'NNPS', 'RB', 'RP', 'IN', 'VB', 'VBD', 'VBN', 'VBP'])
-writeConfMatrixAndAccuracyTableToCSV(diff_keys=d_keys, question='q1')
+writeConfMatrixAndAccuracyTableToCSV(diff_keys=d_keys, question='p1')
 print accuracyDict[OVERALL_ACCURACY]
-print 'Question 1 done'
+print 'Part 1 done'
 #question 2
 #part1
 train_data, test_data, diff_pos = prepareData()
@@ -233,11 +233,11 @@ bigramTagger = BigramTagger(train_data, backoff= unigramTagger)
 accuracyDict, confusionMatrix, output_predictions = predictAndEvaluate(bigramTagger, test_data, diff_pos,\
                                                                       replaceByCoarseGrainedTags=True)
 write_predictions_to_file(os.path.join(os.getcwd(),'Method-A-predictions.tsv'), output_predictions)
-writeConfMatrixAndAccuracyTableToCSV(diff_keys=None, question='q2-p1')
+writeConfMatrixAndAccuracyTableToCSV(diff_keys=None, question='p2-MA')
 # print confusionMatrix
 # print len(confusionMatrix.keys())
 print accuracyDict[OVERALL_ACCURACY]
-print 'Question 2 Part 1 done'
+print 'Part 2 Method A done'
 
 #part2
 train_data, test_data, diff_pos = prepareData(replaceByCoarseGrainedTags=True)
@@ -245,8 +245,8 @@ unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('SNN'))
 bigramTagger = BigramTagger(train_data, backoff= unigramTagger)
 accuracyDict, confusionMatrix, output_predictions = predictAndEvaluate(bigramTagger, test_data, diff_pos)
 write_predictions_to_file(os.path.join(os.getcwd(),'Method-B-predictions.tsv'), output_predictions)
-writeConfMatrixAndAccuracyTableToCSV(diff_keys=None, question='q2-p2')
+writeConfMatrixAndAccuracyTableToCSV(diff_keys=None, question='p2-MB')
 # print confusionMatrix
 # print len(confusionMatrix.keys())
 print accuracyDict[OVERALL_ACCURACY]
-print 'Question 2 Part 2 done'
+print 'Part 2 Method B done'
