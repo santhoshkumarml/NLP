@@ -153,6 +153,7 @@ def predictAndEvaluate(posTagger, testData, diff_pos, replaceByCoarseGrainedTags
 
             if predicted_tag == real_tag:
                 correctlyPredictedTagCountDict[predicted_tag] += 1
+
             confusion_matrix_entry = (real_tag, predicted_tag)
             confusionMatrix[confusion_matrix_entry] += 1
             allTagsTotalDict[real_tag] += 1
@@ -175,10 +176,10 @@ def predictAndEvaluate(posTagger, testData, diff_pos, replaceByCoarseGrainedTags
 # write evaluation tables to the CSV
 def writeConfMatrixAndAccuracyTableToCSV(diff_keys, question):
     with open(os.path.join(os.getcwd(), 'accuracy_'+question+'.tsv'), 'w') as f:
-        if diff_keys != None:
-            sorted_keys = sorted(diff_keys, key = lambda key: accuracyDict[key])
-        else:
-            sorted_keys = sorted(accuracyDict.keys(), key = lambda key: accuracyDict[key])
+        # if diff_keys != None:
+        #     sorted_keys = sorted(diff_keys, key = lambda key: accuracyDict[key])
+        # else:
+        sorted_keys = sorted(accuracyDict.keys(), key = lambda key: accuracyDict[key])
         out1 = 'POS'+'\t'+'Accuracy'+'\n'
         for key in sorted_keys:
             out1 = out1+key+'\t'+str(accuracyDict[key])+'\n'
@@ -207,7 +208,7 @@ def writeConfMatrixAndAccuracyTableToCSV(diff_keys, question):
 #--------------------------------------------------------------------------------------------------------------------------
 #question 1
 train_data, test_data, diff_pos = prepareData()
-unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NNPS'))
+unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NN'))
 bigramTagger = BigramTagger(train_data, backoff = unigramTagger)
 accuracyDict, confusionMatrix, output_predictions = predictAndEvaluate(bigramTagger, test_data, diff_pos)
 write_predictions_to_file(os.path.join(os.getcwd(),'part-I-predictions.tsv'), output_predictions)
@@ -219,6 +220,7 @@ write_predictions_to_file(os.path.join(os.getcwd(),'part-I-predictions.tsv'), ou
 # keys = sorted(accuracyDict.keys(), key= lambda key: accuracyDict[key])
 # print [(key,accuracyDict[key]) for key in keys]
 
+# shortened keys so as to reduce the confusion matrix size
 d_keys = set(['JJ', 'NN', 'NNP', 'NNPS', 'RB', 'RP', 'IN', 'VB', 'VBD', 'VBN', 'VBP'])
 writeConfMatrixAndAccuracyTableToCSV(diff_keys=d_keys, question='q1')
 print accuracyDict[OVERALL_ACCURACY]
