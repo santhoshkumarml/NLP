@@ -4,8 +4,7 @@ __author__ = 'santhosh'
 import nltk
 from nltk import *
 import re
-import csv
-from cStringIO import StringIO
+from datetime import datetime
 
 nltk.data.path.append('/media/santhosh/Data/workspace/nltk_data')
 
@@ -13,12 +12,15 @@ NOVEL_BASE = '/media/santhosh/Data/workspace/nlp_project/novels'
 NOVEL_META = 'novel_meta.txt'
 dataset_pattern = r'[*]+DATASET:.*[*]+'
 folder_pattern = r'[*]+.*[*]+'
-entry_pattern = r'(SUCCESS|FAILURE): FileName:.*,Title:.*,Author:.*,Language:.*,DownloadCount:.*'
+entry_pattern = r'(SUCCESS|FAILURE).+:.+'
 SUCCESS_PATTERN = 'SUCCESS'
 FAILURE_PATTERN = 'FAILURE'
 
 KEY_TOKENS = 'FileName|Title|Author|Language|DownloadCount'
 LANG_TOKEN = 'Language'
+FILE_NAME = 'FileName'
+CLASS = 'class'
+TAGS = 'TAGS'
 
 
 def fixMetaInfoRecord(tokens):
@@ -56,12 +58,15 @@ def processMetaInfoRecord(meta_dict_for_dataset, classification, line):
     for token in tokens:
         key,value = token.split(':',1)
         key,value = key.strip(), value.strip()
-        if key == 'FileName':
+        if key == FILE_NAME:
+            if value in meta_dict_for_dataset:
+                print 'Already Present', value
             meta_dict_for_dataset[value] = dict()
             meta_dict_for_file = meta_dict_for_dataset[value]
         else:
             meta_dict_for_file[key] = value
-    meta_dict_for_file['class'] = classification
+    meta_dict_for_file[CLASS] = classification
+    meta_dict_for_file[TAGS] = dict()
 
 def loadInfoFromMetaFile():
     meta_dict = dict()
@@ -72,7 +77,7 @@ def loadInfoFromMetaFile():
             if re.match(dataset_pattern, line):
                 line_strip = line.replace('*','')
                 dataset = line_strip.split(':')[1].strip()
-                meta_dict[dataset] = {SUCCESS_PATTERN:dict(), FAILURE_PATTERN:dict()}
+                meta_dict[dataset] = dict()
             elif re.match(entry_pattern,line):
                 if SUCCESS_PATTERN+':' in line:
                     processMetaInfoRecord(meta_dict[dataset], SUCCESS_PATTERN, line)
@@ -101,24 +106,39 @@ def listGenreWiseFileNames():
         
     return genre_to_file_list
 
-def readGenreBasedFiles(genre_to_file_list, meta_dict):
+def readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, tagger):
     for genre in genre_to_file_list:
-        print 'Genre:',genre
         meta_dict_for_genre = meta_dict[genre]
-        print '--------------------------------------------------------------'
+        # print 'Number of Files=',len(meta_dict_for_genre)
+        # print '--------------------------------------------------------------'
         for genre_file_path,genre_file_name in genre_to_file_list[genre]:
-            print 'File:',genre_file_path
-            if genre_file_name not in meta_dict_for_genre or meta_dict_for_genre[genre_file_name][LANG_TOKEN] != 'en':
+            if genre_file_name not in meta_dict_for_genre:
                 continue
+            pos_tag_dict = dict()
             with open(genre_file_path) as f:
                 filelines = f.readlines()
-                for fileline in filelines:
-                    tokens = nltk.word_tokenize(fileline)
-                    print nltk.pos_tag(tokens)
-            print '--------------------------------------------------------------'
-        print '--------------------------------------------------------------'
-        print '--------------------------------------------------------------'
+                tokens = [ [word  for word in line.split()] for line in filelines]
+                pos_tagged_lines = tagger.tag_sents(tokens)
+                for pos_tags in pos_tagged_lines:
+                    for word,tag in pos_tags:
+                        if tag not in pos_tag_dict:
+                            pos_tag_dict[tag] = 0.0
+                        pos_tag_dict[tag]+= 1.0
+            total_tags = sum(pos_tag_dict.values())
+            pos_tag_dict = {key:(pos_tag_dict[key]/total_tags) for key in pos_tag_dict}
+            meta_dict_for_genre_file = meta_dict_for_genre[genre_file_name]
+            meta_dict_for_genre_file[TAGS] = pos_tag_dict
+#             print '--------------------------------------------------------------'
+#         print '--------------------------------------------------------------'
+#         print '--------------------------------------------------------------'
 
+start_time = datetime.now()
 meta_dict = loadInfoFromMetaFile()
 genre_to_file_list = listGenreWiseFileNames()
-readGenreBasedFiles(genre_to_file_list, meta_dict)
+train_data = nltk.corpus.treebank.tagged_sents()
+unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NN'))
+bigramTagger = BigramTagger(train_data, backoff = unigramTagger)
+readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, bigramTagger)
+print meta_dict
+end_time = datetime.now()
+print 'Total Time', end_time-start_time
