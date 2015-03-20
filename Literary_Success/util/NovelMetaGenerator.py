@@ -132,14 +132,17 @@ def readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, tagger):
 #         print '--------------------------------------------------------------'
 #         print '--------------------------------------------------------------'
 
-start_time = datetime.now()
-meta_dict = loadInfoFromMetaFile()
-genre_to_file_list = listGenreWiseFileNames()
-train_data = nltk.corpus.treebank.tagged_sents()
-unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NN'))
-bigramTagger = BigramTagger(train_data, backoff = unigramTagger)
-readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, bigramTagger)
-with open('novel_meta.meta', 'w') as f:
-    f.write("META="+meta_dict)
-end_time = datetime.now()
-print 'Total Time', end_time-start_time
+def extractMetaDataAndPOSTagsDistributions():
+    start_time = datetime.now()
+    meta_dict = loadInfoFromMetaFile()
+    genre_to_file_list = listGenreWiseFileNames()
+    train_data = nltk.corpus.treebank.tagged_sents()
+    unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NN'))
+    bigramTagger = BigramTagger(train_data, backoff=unigramTagger)
+    readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, bigramTagger)
+    with open('../novel_meta.meta', 'w') as f:
+        f.write(str(meta_dict))
+    end_time = datetime.now()
+    print 'Total Time', end_time - start_time
+
+extractMetaDataAndPOSTagsDistributions()
