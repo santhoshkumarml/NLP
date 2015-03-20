@@ -139,6 +139,7 @@ train_data = nltk.corpus.treebank.tagged_sents()
 unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NN'))
 bigramTagger = BigramTagger(train_data, backoff = unigramTagger)
 readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, bigramTagger)
-print meta_dict
+with open('novel_meta.meta', 'w') as f:
+    f.write("META="+meta_dict)
 end_time = datetime.now()
 print 'Total Time', end_time-start_time
