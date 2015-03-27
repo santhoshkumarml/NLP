@@ -9,7 +9,7 @@ TAGS = 'TAGS'
 SUCCESS_PATTERN = 'SUCCESS'
 FAILURE_PATTERN = 'FAILURE'
 
-with open('../novel_meta.meta', 'r') as f:
+with open('../novel_meta_pos.meta', 'r') as f:
     meta_dict = dict()
     content = content+f.readline()
     exec(content)

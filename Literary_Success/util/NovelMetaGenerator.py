@@ -106,7 +106,7 @@ def listGenreWiseFileNames():
         
     return genre_to_file_list
 
-def readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, tagger):
+def readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, tagger=None):
     for genre in genre_to_file_list:
         meta_dict_for_genre = meta_dict[genre]
         # print 'Number of Files=',len(meta_dict_for_genre)
@@ -118,7 +118,11 @@ def readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, tagger):
             with open(genre_file_path) as f:
                 filelines = f.readlines()
                 tokens = [ [word  for word in line.split()] for line in filelines]
-                pos_tagged_lines = tagger.tag_sents(tokens)
+                pos_tagged_lines = None
+                if tagger != None:
+                    pos_tagged_lines = tagger.tag_sents(tokens)
+                else:
+                    pos_tagged_lines = nltk.pos_tag_sents(tokens)
                 for pos_tags in pos_tagged_lines:
                     for word,tag in pos_tags:
                         if tag not in pos_tag_dict:
@@ -140,7 +144,7 @@ def extractMetaDataAndPOSTagsDistributions():
     unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NN'))
     bigramTagger = BigramTagger(train_data, backoff=unigramTagger)
     readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, bigramTagger)
-    with open('../novel_meta.meta', 'w') as f:
+    with open('../novel_meta_pos.meta', 'w') as f:
         f.write(str(meta_dict))
     end_time = datetime.now()
     print 'Total Time', end_time - start_time
