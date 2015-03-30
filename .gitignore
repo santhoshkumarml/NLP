@@ -14,3 +14,5 @@ local.properties
 .pydevproject
 .project
 /RemoteSystemsTempFiles/
+.classpath
+target/
