@@ -108,8 +108,6 @@ def listGenreWiseFileNames():
     return genre_to_file_list
 
 def readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, tagger=None):
-    st = POSTagger('/media/santhosh/Data/workspace/nlp_project/models/english-bidirectional-distsim.tagger',
-                '/media/santhosh/Data/workspace/nlp_project/stanford-postagger.jar')
     for genre in genre_to_file_list:
         meta_dict_for_genre = meta_dict[genre]
         # print 'Number of Files=',len(meta_dict_for_genre)
@@ -125,9 +123,7 @@ def readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, tagger=None):
                 if tagger != None:
                     pos_tagged_lines = tagger.tag_sents(tokens)
                 else:
-                    for line_words in tokens:
-                        pos_tagged_line = st.tag(line_words)
-                        pos_tagged_lines.append(pos_tagged_line)
+                    pos_tagged_lines = nltk.pos_tag_sents(tokens)
                 for pos_tags in pos_tagged_lines:
                     for word,tag in pos_tags:
                         if tag not in pos_tag_dict:
@@ -148,7 +144,9 @@ def extractMetaDataAndPOSTagsDistributions():
     train_data = nltk.corpus.treebank.tagged_sents()
     unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NN'))
     bigramTagger = BigramTagger(train_data, backoff=unigramTagger)
-    readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, None)
+    stanford_tagger = POSTagger('/media/santhosh/Data/workspace/nlp_project/models/english-bidirectional-distsim.tagger',
+                '/media/santhosh/Data/workspace/nlp_project/stanford-postagger.jar')
+    readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, stanford_tagger)
     with open('../novel_meta_pos_stanford.meta', 'w') as f:
         f.write(str(meta_dict))
     end_time = datetime.now()
