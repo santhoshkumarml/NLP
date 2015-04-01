@@ -148,7 +148,7 @@ def extractMetaDataAndPOSTagsDistributions():
     train_data = nltk.corpus.treebank.tagged_sents()
     unigramTagger = UnigramTagger(train_data, backoff=nltk.DefaultTagger('NN'))
     bigramTagger = BigramTagger(train_data, backoff=unigramTagger)
-    readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, bigramTagger)
+    readGenreBasedFilesAndTagWords(genre_to_file_list, meta_dict, None)
     with open('../novel_meta_pos_stanford.meta', 'w') as f:
         f.write(str(meta_dict))
     end_time = datetime.now()
