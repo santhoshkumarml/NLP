@@ -1,14 +1,15 @@
-'''
+"""
 Created on Feb 13, 2015
 
 @author: santhosh
-'''
-from algos import HMMUtil
+"""
+
+from algos.HMM import HMM
 
 states = ('Healthy', 'Fever')
  
 observations = ('normal', 'cold', 'dizzy')
- 
+
 start_probability = {'Healthy': 0.6, 'Fever': 0.4}
  
 transition_probability = {
@@ -21,10 +22,10 @@ emission_probability = {
    'Fever' : {'normal': 0.1, 'cold': 0.3, 'dizzy': 0.6}
    }
 
-hmm = HMMUtil.HMM(states, start_probability, transition_probability, emission_probability)
+hmm = HMM(states, start_probability, transition_probability, emission_probability)
 
-print hmm.runNaiveAlgo(observations, '')
-print hmm.runViterbiAlgo(observations)
+print(hmm.run_naive_algo(observations, ''))
+print(hmm.run_viterbi_algo(observations))
 
 states = (0, 1)
 
@@ -42,6 +43,6 @@ emission_probability = {
    1 : {1: 0.166666667, 2: 0.166666667, 3:0.166666667, 4: 0.166666667, 5: 0.166666667, 6: 0.166666667}
    }
 
-hmm = HMMUtil.HMM(states, start_probability, transition_probability, emission_probability)
+hmm = HMM(states, start_probability, transition_probability, emission_probability)
 
-print hmm.runBaumWelchAlgo(observations)
+print(hmm.run_baum_welch_algo(observations))

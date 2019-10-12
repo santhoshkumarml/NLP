@@ -6,6 +6,7 @@ tmp/
 *.bak
 *.swp
 *.pyc
+*.iml
 *~.nib
 local.properties
 .settings/
